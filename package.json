@@ -1,0 +1,28 @@
+{
+  "name": "binder",
+  "version": "0.1.0",
+  "description": "A stuffed binder of exercises and notes to learn useful things",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jacobshu/binder.git"
+  },
+  "keywords": [
+    "oop"
+  ],
+  "author": "Jacob Shulenberger",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jacobshu/binder/issues"
+  },
+  "homepage": "https://github.com/jacobshu/binder#readme",
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.0",
+    "ts-jest": "^27.0.7",
+    "ts-node": "^10.4.0"
+  }
+}
