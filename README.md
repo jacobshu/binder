@@ -1,11 +1,13 @@
-# Object Oriented Programming
+# Learning Things
 
-This repo will have practice code from various sources starting with:
+This repo will have practice code from various sources including:
 - Head First Design Patterns
+- Various CTFs
 
-There will be multiple implementations of each of exercise targeting various languages:
+There will be a variety of languages used to help develop a broad familiarity:
 - C#
 - Dart
 - Javascript
+- Python
 - Rust
 
