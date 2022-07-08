@@ -22,4 +22,9 @@ doc/api/
 
 node_modules/
 coverage/
+*~
+\#*
+.\#*
 .DS_Store
+compiled/
+/doc/
