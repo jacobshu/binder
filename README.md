@@ -1,6 +1,7 @@
 # Learning Things
 
 This repo will have practice code from various sources including:
+- Structure and Interpretation of Computer Programs
 - Head First Design Patterns
 - Various CTFs
 
