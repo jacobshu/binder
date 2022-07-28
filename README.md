@@ -11,4 +11,4 @@ There will be a variety of languages used to help develop a broad familiarity:
 - Javascript
 - Python
 - Rust
-
+- Scheme
