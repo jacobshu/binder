@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A stuffed binder of exercises and notes to learn useful things",
   "main": "dist/index.js",
+  "type": "module",
   "scripts": {
     "test": "jest --coverage"
   },

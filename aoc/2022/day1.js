@@ -1,4 +1,4 @@
-import { input } from 'input';
+import { input } from './input.js';
 
 let elves = input.split(/\n\n/g);
 let mostCarried = {
