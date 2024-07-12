@@ -7,3 +7,7 @@ Console.WriteLine("Let's mosey");
 
 // How many statements can a program contain?
 // As many as the disk can contain.
+string name;
+Console.WriteLine("Bread is ready. Who shall it go to?");
+name = Console.ReadLine();
+Console.WriteLine("It is written. " + name + " receives bread");
