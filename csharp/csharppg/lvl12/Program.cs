@@ -31,4 +31,22 @@
   }
 }
 
-duplicateArray();
+void minimum(int[] array)
+{
+  int currentSmallest = int.MaxValue;
+  foreach (int number in array)
+  {
+    if (number < currentSmallest)
+      currentSmallest = number;
+  }
+  Console.WriteLine(currentSmallest);
+}
+
+void average(int[] array)
+{
+  int total = 0;
+  foreach (int number in array)
+    total += number;
+  float average = (float)total / array.Length;
+  Console.WriteLine(average);
+}
