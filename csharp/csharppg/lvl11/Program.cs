@@ -1,9 +1,4 @@
-﻿int pilotNumber = -1;
-while (pilotNumber < 0 || pilotNumber > 100)
-{
-  Console.Write("Pick a number, Pilot. ");
-  pilotNumber = Convert.ToInt16(Console.ReadLine());
-}
+﻿int pilotNumber = AskForNumberInRange("Pick a number, Pilot", 0, 100);
 
 Console.Clear();
 
@@ -38,4 +33,16 @@ for (int i = 0; i < 100; i++) {
     blastType = "Normal";
   }
   Console.WriteLine($"{i}: {blastType}");
+}
+
+int AskForNumberInRange(string text, int min, int max) 
+{
+  int result;
+  do {
+    Console.Write(text + " ");
+    result = Convert.ToInt32(Console.ReadLine());
+  }
+  while (result < min || result > max);
+
+  return result;
 }
