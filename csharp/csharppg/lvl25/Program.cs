@@ -1,0 +1,96 @@
+﻿class Pack
+{
+  public InventoryItem[] Items;
+  public float MaxWeight { get; }
+  public float MaxVolume { get; }
+  public int MaxItems { get; }
+  public int ItemCount { get => Items.Length; }
+  public float Weight
+  {
+    get
+    {
+      float total = 0;
+      for (int i = 0; i < Items.Length; i++)
+      {
+        total += Items[i].Weight;
+      }
+      return total;
+    }
+  }
+  
+  public float Volume
+  {
+    get
+    {
+      float total = 0;
+      for (int i = 0; i < Items.Length; i++)
+      {
+        total += Items[i].Volume;
+      }
+      return total;
+    }
+  }
+
+  
+  public Pack(int itemLimit, float weightLimit, float volumeLimit)
+  {
+    MaxWeight = weightLimit;
+    MaxVolume = volumeLimit;
+    Items = new InventoryItem[itemLimit];
+  }
+
+  public bool Add(InventoryItem item)
+  {
+    if (Weight + item.Weight < MaxWeight && Volume + item.Volume < MaxVolume && ItemCount + 1 < MaxItems)
+    {
+      Array.Resize(ref Items, Items.Length + 1);
+      Items[Items.Length - 1] = item;
+      return true;
+    }
+    return false;
+  }
+}
+
+class InventoryItem
+{
+  public float Weight { get; set; }
+  public float Volume { get; set; }
+
+  public InventoryItem(float weight, float volume)
+  {
+    Weight = weight;
+    Volume = volume;
+  }
+
+
+}
+
+class Arrow : InventoryItem
+{
+  public Arrow() : base(0.1f, 0.05f) { }
+}
+
+class Bow : InventoryItem
+{
+  public Bow() : base(1f, 4f) { }
+}
+
+class Rope : InventoryItem
+{
+  public Rope() : base(1f, 1.5f) { }
+}
+
+class Water : InventoryItem
+{
+  public Water() : base(2f, 3f) { }
+}
+
+class Rations : InventoryItem
+{
+  public Rations() : base(1f, 0.5f) { }
+}
+
+class Sword : InventoryItem
+{
+  public Sword() : base(5f, 3f) { }
+}
