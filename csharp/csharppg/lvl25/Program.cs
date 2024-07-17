@@ -17,7 +17,7 @@
       return total;
     }
   }
-  
+
   public float Volume
   {
     get
@@ -31,7 +31,17 @@
     }
   }
 
-  
+  public override string ToString()
+  {
+    string allItems = "The pack has: ";
+    for (int i = 0; i < ItemCount; i++)
+    {
+      allItems += Items[i].ToString() + " ";
+    }
+
+    return allItems;  
+  }
+
   public Pack(int itemLimit, float weightLimit, float volumeLimit)
   {
     MaxWeight = weightLimit;
@@ -68,29 +78,59 @@ class InventoryItem
 class Arrow : InventoryItem
 {
   public Arrow() : base(0.1f, 0.05f) { }
+
+  public override string ToString()
+  {
+    return "Arrow";
+  }
 }
 
 class Bow : InventoryItem
 {
   public Bow() : base(1f, 4f) { }
+
+  public override string ToString()
+  {
+    return "Bow";
+  }
 }
 
 class Rope : InventoryItem
 {
   public Rope() : base(1f, 1.5f) { }
+
+  public override string ToString()
+  {
+    return "Rope";
+  }
 }
 
 class Water : InventoryItem
 {
   public Water() : base(2f, 3f) { }
+
+  public override string ToString()
+  {
+    return "Water";
+  }
 }
 
 class Rations : InventoryItem
 {
   public Rations() : base(1f, 0.5f) { }
+
+  public override string ToString()
+  {
+    return "Rations";
+  }
 }
 
 class Sword : InventoryItem
 {
   public Sword() : base(5f, 3f) { }
+
+  public override string ToString()
+  {
+    return "Sword";
+  }
 }
