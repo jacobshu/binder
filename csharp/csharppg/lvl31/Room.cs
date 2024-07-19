@@ -36,7 +36,7 @@ public class PitRoom : Room
   public override void Render()
   {
     Console.ForegroundColor = ConsoleColor.Black;
-    Console.Write("O");
+    Console.Write(" O ");
     Console.ResetColor();
   }
 }
@@ -47,7 +47,7 @@ public class MaelstromRoom : Room
   public override void Render()
   {
     Console.ForegroundColor = ConsoleColor.Blue;
-    Console.Write("§");
+    Console.Write(" § ");
     Console.ResetColor();
   }
 }
@@ -58,7 +58,7 @@ public class AmarokRoom : Room
   public override void Render()
   {
     Console.ForegroundColor = ConsoleColor.DarkRed;
-    Console.Write("#");
+    Console.Write(" # ");
     Console.ResetColor();
   }
 }

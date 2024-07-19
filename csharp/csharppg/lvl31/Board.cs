@@ -4,20 +4,62 @@ public class Board
   private Point CurrentCursor { get; }
   private Room[,] BoardState;
   //    pit    ama   mael
-  // sm   1      1      1  4
-  // md   2      2      1  6
-  // lg   4      3      2  8
+  // sm   1      1      1  3/16,
+  // md   2      2      1  5/36
+  // lg   4      3      2  9/64
 
   public Board(int size)
   {
     Random rand = new Random();
+    int hazards = BoardSize >= 8 ? BoardSize - 1 : BoardSize + 1;
+    int pits = (int)Math.Round(2 / 25 * Math.Pow(BoardSize, 2));
+    int amaroks = (int)Math.Round((double)(hazards - pits) / 2);
+    int maelstroms = hazards - pits - amaroks > 0 ? hazards - pits - amaroks : 0;
+    Hazard[] hazardList = new Hazard[hazards];
+    for (int i = 0; i < hazards; i++)
+    {
+      if (i < pits - 1)
+      {
+        hazardList[i] = Hazard.Pit;
+      }
+      else if (i < pits + amaroks - 1)
+      {
+        hazardList[i] = Hazard.Amarok;
+      }
+      else
+      {
+        hazardList[i] = Hazard.Maelstrom;
+      }
+    }
+    rand.Shuffle(hazardList);
+
     CurrentCursor = new Point(0, 0);
     Room[,] newState = new Room[size, size];
     for (int i = 0; i < size; i++)
     {
       for (int j = 0; j < size; j++)
       {
-        newState[i, j] = new EmptyRoom(i, j);
+        bool hasHazard = rand.Next(100) < 20;
+        if (hasHazard)
+        {
+          switch (hazardList[hazards - 1])
+          {
+            case Hazard.Pit:
+            newState[i, j] = new PitRoom(i, j);
+            break;
+            case Hazard.Amarok:
+              newState[i, j] = new AmarokRoom(i, j);
+              break;
+            case Hazard.Maelstrom:
+              newState[i, j] = new MaelstromRoom(i, j);
+              break;
+          }
+          /*hazards -= 1;*/
+        }
+        else
+        {
+          newState[i, j] = new EmptyRoom(i, j);
+        }
       }
     }
     BoardState = newState;
@@ -51,11 +93,11 @@ public class Board
       Border(BorderSide.Side, ConsoleColor.DarkGreen);
       Console.WriteLine();
     }
-    Border(BorderSide.Bottom, ConsoleColor.DarkGreen); 
+    Border(BorderSide.Bottom, ConsoleColor.DarkGreen);
     Console.WriteLine();
 
-    Console.WriteLine($"Arrow Keys to move cursor. Press [Enter] to move a piece.");
-    Console.WriteLine($"Press [R] to reset the board.");
+    Console.WriteLine($"Use the arrow keys [ ▲ ▼ ◀ ▶ ] to move.");
+    Console.WriteLine($"[R]eset the board. [Q]uit the game.");
     Console.ResetColor();
   }
 

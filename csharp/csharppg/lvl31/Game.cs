@@ -39,7 +39,7 @@ public class Game
         case ConsoleKey.Q:
           Console.Clear();
           Console.ForegroundColor = ConsoleColor.Green;
-          Console.WriteLine("Come back");
+          Console.WriteLine("The fountain awaits...");
           Environment.Exit(0);
           break;
       }
