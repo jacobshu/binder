@@ -1,12 +1,10 @@
 public abstract class Room
 {
-  public Point Location { get; }
   public Hazard? RoomHazard { get; }
   private ConsoleColor Color { get; }
 
-  public Room(int x, int y, Hazard? hazard)
+  public Room(Hazard? hazard)
   {
-    Location = new Point(x, y);
     RoomHazard = hazard;
   }
 
@@ -22,7 +20,7 @@ public abstract class Room
 
 public class EmptyRoom : Room
 {
-  public EmptyRoom(int x, int y) : base(x, y, null) { }
+  public EmptyRoom() : base(null) { }
 
   public override void Render()
   {
@@ -32,7 +30,7 @@ public class EmptyRoom : Room
 
 public class PitRoom : Room
 {
-  public PitRoom(int x, int y) : base(x, y, Hazard.Pit) { }
+  public PitRoom() : base(Hazard.Pit) { }
   public override void Render()
   {
     Console.ForegroundColor = ConsoleColor.Black;
@@ -43,7 +41,7 @@ public class PitRoom : Room
 
 public class MaelstromRoom : Room
 {
-  public MaelstromRoom(int x, int y) : base(x, y, Hazard.Maelstrom) { }
+  public MaelstromRoom() : base(Hazard.Maelstrom) { }
   public override void Render()
   {
     Console.ForegroundColor = ConsoleColor.Blue;
@@ -54,7 +52,7 @@ public class MaelstromRoom : Room
 
 public class AmarokRoom : Room
 {
-  public AmarokRoom(int x, int y) : base(x, y, Hazard.Amarok) { }
+  public AmarokRoom() : base(Hazard.Amarok) { }
   public override void Render()
   {
     Console.ForegroundColor = ConsoleColor.DarkRed;

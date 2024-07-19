@@ -1,3 +1,8 @@
+public static class Globals
+{
+  public const bool DEBUG = true;
+}
+
 public class Game
 {
   public Board GameBoard;
@@ -34,8 +39,11 @@ public class Game
         /*  break;*/
         /*case ConsoleKey.RightArrow:*/
         /*  break;*/
-        /*case ConsoleKey.R:*/
-        /*  break;*/
+        case ConsoleKey.R:
+          Console.Clear();
+          int size = GameBoard.BoardSize;
+          GameBoard = new Board(size);
+          break;
         case ConsoleKey.Q:
           Console.Clear();
           Console.ForegroundColor = ConsoleColor.Green;
