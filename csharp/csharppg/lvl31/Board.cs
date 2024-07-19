@@ -1,7 +1,7 @@
 public class Board
 {
   public int BoardSize { get; }
-  private Point CurrentCursor { get; }
+  public Point CurrentCursor { get; set; }
   private Room[,] BoardState;
   //    pit    ama   mael
   // sm   1      1      1  3/16,
@@ -20,10 +20,10 @@ public class Board
     {
       for (int j = 0; j < size; j++)
       {
-        newState[i, j] = new EmptyRoom();
+        newState[i, j] = new EmptyRoom(i, j);
       }
     }
-    BoardState = PlaceHazards(newState, hazards, rand);
+    BoardState = PlaceSpecialRooms(newState, hazards, rand);
   }
 
   public Room RoomAt(int x, int y)
@@ -31,25 +31,55 @@ public class Board
     return BoardState[x, y];
   }
 
+  public Room[] GetAdjacentRooms(int x, int y)
+  {
+    Room[] adj = new Room[9];
+    int count = 0;
+    for (int i = -1; i < 1; i++)
+    {
+      for (int j = -1; j < 1; j++)
+      {
+        adj[count] = RoomAt(x + i, y + j);
+      }
+    }
+    return adj;
+  }
+
   public void Render()
   {
     Border(BorderSide.Top, ConsoleColor.DarkGreen);
     Console.WriteLine();
 
+    Room[] adjacentRooms = GetAdjacentRooms(CurrentCursor.X, CurrentCursor.Y);
+    var nonEmptyRooms = Enumerable.Where(adjacentRooms, r => !(r is EmptyRoom));
+    nonEmptyRooms.ToString();
+
+    foreach (Room ar in adjacentRooms)
+    {
+      (string nearbyDesc, ConsoleColor nearbyColor) = ar.Nearby();
+      (string enterDesc, ConsoleColor enterColor) = ar.Enter();
+      Console.ForegroundColor = enterColor;
+      Console.Write(enterDesc);
+      Console.ForegroundColor = nearbyColor;
+      Console.Write(nearbyDesc);
+      Console.ResetColor();
+    }
+    
     int iterator = 0;
     for (int i = 0; i < BoardState.GetLength(0); i++)
     {
       Border(BorderSide.Side, ConsoleColor.DarkGreen);
       for (int j = 0; j < BoardState.GetLength(1); j++)
       {
-        /*if (CurrentCursor.X == i && CurrentCursor.Y == j)*/
-        /*{*/
-        /*  Console.BackgroundColor = ConsoleColor.Cyan;*/
-        /*}*/
-        RoomAt(i, j).Render();
+        RoomAt(i, j).Render(CurrentCursor.X == i && CurrentCursor.Y == j);
+        Console.ResetColor(); // • 
         iterator++;
+
       }
       Border(BorderSide.Side, ConsoleColor.DarkGreen);
+      
+      // write narrations[i] here
+
       Console.WriteLine();
     }
     Border(BorderSide.Bottom, ConsoleColor.DarkGreen);
@@ -97,27 +127,37 @@ public class Board
     return hazardList;
   }
 
-  private Room[,] PlaceHazards(Room[,] state, Hazard[] hazards, Random rand)
+  private Room[,] PlaceSpecialRooms(Room[,] state, Hazard[] hazards, Random rand)
   {
     int i = 0;
-    while (i < hazards.Length)
+    while (i < hazards.Length + 1)
     {
       int x = rand.Next(BoardSize);
       int y = rand.Next(BoardSize);
       if (x == 0 && y == 0) continue;
       if (state[x, y] is PitRoom || state[x, y] is AmarokRoom || state[x, y] is MaelstromRoom) continue;
-
-      switch (hazards[i])
+      
+      if (i >= hazards.Length)
       {
-        case Hazard.Pit:
-          state[x, y] = new PitRoom();
-          break;
-        case Hazard.Amarok:
-          state[x, y] = new AmarokRoom();
-          break;
-        case Hazard.Maelstrom:
-          state[x, y] = new MaelstromRoom();
-          break;
+        if (Globals.DEBUG) Console.WriteLine($"iteration: {i}, fountain room");
+        int newX = rand.Next(BoardSize / 2, BoardSize);
+        int newY = rand.Next(BoardSize / 2, BoardSize);
+        if (state[newX, newY] is PitRoom || state[newX, newY] is AmarokRoom || state[newX, newY] is MaelstromRoom) continue;
+        state[newX, newY] = new FountainRoom(newX, newY);
+      } else {
+        if (Globals.DEBUG) Console.WriteLine($"iteration: {i}, hazard room");
+        switch (hazards[i])
+        {
+          case Hazard.Pit:
+            state[x, y] = new PitRoom(x, y);
+            break;
+          case Hazard.Amarok:
+            state[x, y] = new AmarokRoom(x, y);
+            break;
+          case Hazard.Maelstrom:
+            state[x, y] = new MaelstromRoom(x, y);
+            break;
+        }
       }
       i++;
     }

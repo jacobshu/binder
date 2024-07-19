@@ -27,18 +27,27 @@ public class Game
       };
       ConsoleKey key = Console.ReadKey().Key;
       if (!Array.Exists(validInputs, k => k == key)) continue;
+      Point cc = GameBoard.CurrentCursor;
       switch (key)
       {
         /*case ConsoleKey.Enter:*/
         /*  break;*/
-        /*case ConsoleKey.DownArrow:*/
-        /*  break;*/
-        /*case ConsoleKey.UpArrow:*/
-        /*  break;*/
-        /*case ConsoleKey.LeftArrow:*/
-        /*  break;*/
-        /*case ConsoleKey.RightArrow:*/
-        /*  break;*/
+        case ConsoleKey.DownArrow:
+          int downX = cc.X + 1 > GameBoard.BoardSize - 1 ? GameBoard.BoardSize - 1 : cc.X + 1;
+          GameBoard.CurrentCursor = new Point(downX, cc.Y);
+          break;
+        case ConsoleKey.UpArrow:
+          int upX = cc.X - 1 > GameBoard.BoardSize - 1 ? GameBoard.BoardSize - 1 : cc.X - 1;
+          GameBoard.CurrentCursor = new Point(upX, cc.Y);
+          break;
+        case ConsoleKey.LeftArrow:
+          int leftY = cc.Y - 1 > GameBoard.BoardSize - 1 ? GameBoard.BoardSize - 1 : cc.Y - 1;
+          GameBoard.CurrentCursor = new Point(cc.X, leftY);
+          break;
+        case ConsoleKey.RightArrow:
+          int rightY = cc.Y + 1 > GameBoard.BoardSize - 1 ? GameBoard.BoardSize - 1 : cc.Y + 1;
+          GameBoard.CurrentCursor = new Point(cc.X, rightY);
+          break;
         case ConsoleKey.R:
           Console.Clear();
           int size = GameBoard.BoardSize;
