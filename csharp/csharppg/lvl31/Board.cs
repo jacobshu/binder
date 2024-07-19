@@ -1,6 +1,6 @@
 public class Board
 {
-  private int BoardSize { get; }
+  public int BoardSize { get; }
   private Point CurrentCursor { get; }
   private Room[,] BoardState;
   //    pit    ama   mael
@@ -10,28 +10,9 @@ public class Board
 
   public Board(int size)
   {
+    BoardSize = size;
     Random rand = new Random();
-    int hazards = BoardSize >= 8 ? BoardSize - 1 : BoardSize + 1;
-    int pits = (int)Math.Round(2 / 25 * Math.Pow(BoardSize, 2));
-    int amaroks = (int)Math.Round((double)(hazards - pits) / 2);
-    int maelstroms = hazards - pits - amaroks > 0 ? hazards - pits - amaroks : 0;
-    Hazard[] hazardList = new Hazard[hazards];
-    for (int i = 0; i < hazards; i++)
-    {
-      if (i < pits - 1)
-      {
-        hazardList[i] = Hazard.Pit;
-      }
-      else if (i < pits + amaroks - 1)
-      {
-        hazardList[i] = Hazard.Amarok;
-      }
-      else
-      {
-        hazardList[i] = Hazard.Maelstrom;
-      }
-    }
-    rand.Shuffle(hazardList);
+    Hazard[] hazards = CreateHazards(rand);
 
     CurrentCursor = new Point(0, 0);
     Room[,] newState = new Room[size, size];
@@ -39,31 +20,10 @@ public class Board
     {
       for (int j = 0; j < size; j++)
       {
-        bool hasHazard = rand.Next(100) < 20;
-        if (hasHazard)
-        {
-          switch (hazardList[hazards - 1])
-          {
-            case Hazard.Pit:
-            newState[i, j] = new PitRoom(i, j);
-            break;
-            case Hazard.Amarok:
-              newState[i, j] = new AmarokRoom(i, j);
-              break;
-            case Hazard.Maelstrom:
-              newState[i, j] = new MaelstromRoom(i, j);
-              break;
-          }
-          /*hazards -= 1;*/
-        }
-        else
-        {
-          newState[i, j] = new EmptyRoom(i, j);
-        }
+        newState[i, j] = new EmptyRoom();
       }
     }
-    BoardState = newState;
-    BoardSize = size;
+    BoardState = PlaceHazards(newState, hazards, rand);
   }
 
   public Room RoomAt(int x, int y)
@@ -73,7 +33,6 @@ public class Board
 
   public void Render()
   {
-    Console.WriteLine($"board size is {BoardSize}");
     Border(BorderSide.Top, ConsoleColor.DarkGreen);
     Console.WriteLine();
 
@@ -101,6 +60,75 @@ public class Board
     Console.ResetColor();
   }
 
+  private Hazard[] CreateHazards(Random rand)
+  {
+    int pits = (int)Math.Round(0.75 * BoardSize - 2.25);
+    int amaroks = (int)Math.Round(0.5 * BoardSize - 1);
+    int maelstroms = (int)Math.Round(0.25 * BoardSize - 0.25);
+    int hazards = pits + amaroks + maelstroms;
+    Hazard[] hazardList = new Hazard[hazards];
+    for (int i = 0; i < hazards; i++)
+    {
+      if (i < pits)
+      {
+        hazardList[i] = Hazard.Pit;
+      }
+      else if (i < pits + amaroks)
+      {
+        hazardList[i] = Hazard.Amarok;
+      }
+      else
+      {
+        hazardList[i] = Hazard.Maelstrom;
+      }
+    }
+    rand.Shuffle(hazardList);
+    rand.Shuffle(hazardList);
+
+    if (Globals.DEBUG)
+    {
+      Console.WriteLine($"There are {hazards} hazards comprising: ");
+      Console.WriteLine($"pits {pits}, amaroks: {amaroks}, maelstroms: {maelstroms}");
+      foreach (Hazard h in hazardList)
+      {
+        Console.WriteLine($"{h}");
+      }
+    }
+    return hazardList;
+  }
+
+  private Room[,] PlaceHazards(Room[,] state, Hazard[] hazards, Random rand)
+  {
+    int i = 0;
+    while (i < hazards.Length)
+    {
+      int x = rand.Next(BoardSize);
+      int y = rand.Next(BoardSize);
+      if (x == 0 && y == 0) continue;
+      if (state[x, y] is PitRoom || state[x, y] is AmarokRoom || state[x, y] is MaelstromRoom) continue;
+
+      switch (hazards[i])
+      {
+        case Hazard.Pit:
+          state[x, y] = new PitRoom();
+          break;
+        case Hazard.Amarok:
+          state[x, y] = new AmarokRoom();
+          break;
+        case Hazard.Maelstrom:
+          state[x, y] = new MaelstromRoom();
+          break;
+      }
+      i++;
+    }
+    return state;
+  }
+
+  private Point GetPotentialPoint(Random rand)
+  {
+    return new Point(rand.Next(BoardSize), rand.Next(BoardSize));
+  }
+
   private void Border(BorderSide side, ConsoleColor color)
   {
     string tl = "┏";
@@ -119,7 +147,7 @@ public class Board
       case BorderSide.Top:
         Console.Write(tl);
         Console.Write("   ");
-        IEnumerable<string> tHorizontal = Enumerable.Repeat(hl, BoardSize * 2 + 1);
+        IEnumerable<string> tHorizontal = Enumerable.Repeat(hl, BoardSize * 3 - 3);
         foreach (string str in tHorizontal)
         {
           Console.Write(str);
