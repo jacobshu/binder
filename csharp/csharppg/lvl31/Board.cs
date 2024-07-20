@@ -35,11 +35,14 @@ public class Board
   {
     Room[] adj = new Room[9];
     int count = 0;
-    for (int i = -1; i < 1; i++)
+    for (int i = -1; i <= 1; i++)
     {
-      for (int j = -1; j < 1; j++)
+      for (int j = -1; j <= 1; j++)
       {
-        adj[count] = RoomAt(x + i, y + j);
+        int rx = Math.Clamp(x + i, 0, BoardSize - 1);
+        int ry = Math.Clamp(y + j, 0, BoardSize - 1);
+        if (Globals.DEBUG) Console.WriteLine($"check adjacent room at: {rx}, {ry}, with i: {i}, j: {j}");
+        adj[count] = RoomAt(rx, ry);
       }
     }
     return adj;
@@ -47,37 +50,39 @@ public class Board
 
   public void Render()
   {
+    Room[] adjacentRooms = GetAdjacentRooms(CurrentCursor.X, CurrentCursor.Y);
+    Console.WriteLine($"{adjacentRooms.Length} rooms: {adjacentRooms}");
+    foreach (Room r in adjacentRooms)
+    {
+      Console.WriteLine($"empty: {r is EmptyRoom}, pit: {r is PitRoom}, amarok: {r is AmarokRoom}, maelstrom: {r is MaelstromRoom}");
+    }
+    /*var nonEmptyRooms = Enumerable.Where(adjacentRooms, r => !(r is EmptyRoom));*/
+
     Border(BorderSide.Top, ConsoleColor.DarkGreen);
     Console.WriteLine();
-
-    Room[] adjacentRooms = GetAdjacentRooms(CurrentCursor.X, CurrentCursor.Y);
-    var nonEmptyRooms = Enumerable.Where(adjacentRooms, r => !(r is EmptyRoom));
-    nonEmptyRooms.ToString();
-
     foreach (Room ar in adjacentRooms)
     {
       (string nearbyDesc, ConsoleColor nearbyColor) = ar.Nearby();
-      (string enterDesc, ConsoleColor enterColor) = ar.Enter();
-      Console.ForegroundColor = enterColor;
-      Console.Write(enterDesc);
       Console.ForegroundColor = nearbyColor;
       Console.Write(nearbyDesc);
       Console.ResetColor();
     }
     
     int iterator = 0;
+    (string enterDesc, ConsoleColor enterColor) = ("", ConsoleColor.Gray);
     for (int i = 0; i < BoardState.GetLength(0); i++)
     {
       Border(BorderSide.Side, ConsoleColor.DarkGreen);
       for (int j = 0; j < BoardState.GetLength(1); j++)
       {
-        RoomAt(i, j).Render(CurrentCursor.X == i && CurrentCursor.Y == j);
+        bool isCurrentCursor = CurrentCursor.X == i && CurrentCursor.Y == j;
+        if (isCurrentCursor) (enterDesc, enterColor) = RoomAt(i, j).Enter();
+        RoomAt(i, j).Render(isCurrentCursor);
         Console.ResetColor(); // • 
         iterator++;
-
       }
       Border(BorderSide.Side, ConsoleColor.DarkGreen);
-      
+       
       // write narrations[i] here
 
       Console.WriteLine();
