@@ -81,12 +81,12 @@ public class PitRoom : Room
 
   public override (string, ConsoleColor) Enter()
   {
-    return ("You feel a draft coming from nearby.", ConsoleColor.Black);
+    return ("You fall to your demise.", ConsoleColor.Black);
   }
 
   public override (string, ConsoleColor) Nearby()
   {
-    return ("You fall to your demise.", ConsoleColor.Black);
+    return ("You feel a draft coming from nearby.", ConsoleColor.Black);
   }
 }
 

@@ -33,41 +33,52 @@ public class Board
 
   public Room[] GetAdjacentRooms(int x, int y)
   {
-    Room[] adj = new Room[9];
-    int count = 0;
+    List<(int, int)> coords = new List<(int, int)> { };
+    /*int count = 0;*/
     for (int i = -1; i <= 1; i++)
     {
       for (int j = -1; j <= 1; j++)
       {
         int rx = Math.Clamp(x + i, 0, BoardSize - 1);
         int ry = Math.Clamp(y + j, 0, BoardSize - 1);
-        if (Globals.DEBUG) Console.WriteLine($"check adjacent room at: {rx}, {ry}, with i: {i}, j: {j}");
-        adj[count] = RoomAt(rx, ry);
+        coords.Add((rx, ry));
+        /*coords[count] = (rx, ry);*/
       }
     }
-    return adj;
+
+    var dedup = coords.Distinct().ToList();
+    Room[] result = new Room[dedup.Count];
+    for (int i = 0; i < result.Length; i++)
+    {
+      result[i] = RoomAt(dedup[i].Item1, dedup[i].Item2);
+      if (Globals.DEBUG) Console.WriteLine(dedup[i].ToString());
+    }
+
+    return result;
   }
 
   public void Render()
   {
     Room[] adjacentRooms = GetAdjacentRooms(CurrentCursor.X, CurrentCursor.Y);
     Console.WriteLine($"{adjacentRooms.Length} rooms: {adjacentRooms}");
-    foreach (Room r in adjacentRooms)
+    for (int i = 0; i < adjacentRooms.Length; i++)
     {
-      Console.WriteLine($"empty: {r is EmptyRoom}, pit: {r is PitRoom}, amarok: {r is AmarokRoom}, maelstrom: {r is MaelstromRoom}");
+      Console.Write($"{adjacentRooms[i].ToString()} ");
+      if (i + 1 % (adjacentRooms.Length == 4 ? 2 : 3) == 0) Console.WriteLine("!");
     }
-    /*var nonEmptyRooms = Enumerable.Where(adjacentRooms, r => !(r is EmptyRoom));*/
+    Room[] nonEmptyRooms = Enumerable.Where(adjacentRooms, r => !(r is EmptyRoom)).ToArray();
 
-    Border(BorderSide.Top, ConsoleColor.DarkGreen);
     Console.WriteLine();
-    foreach (Room ar in adjacentRooms)
+    foreach (Room ar in nonEmptyRooms)
     {
       (string nearbyDesc, ConsoleColor nearbyColor) = ar.Nearby();
       Console.ForegroundColor = nearbyColor;
-      Console.Write(nearbyDesc);
+      Console.WriteLine(nearbyDesc);
       Console.ResetColor();
     }
-    
+
+    Border(BorderSide.Top, ConsoleColor.DarkGreen);
+
     int iterator = 0;
     (string enterDesc, ConsoleColor enterColor) = ("", ConsoleColor.Gray);
     for (int i = 0; i < BoardState.GetLength(0); i++)
@@ -82,7 +93,7 @@ public class Board
         iterator++;
       }
       Border(BorderSide.Side, ConsoleColor.DarkGreen);
-       
+
       // write narrations[i] here
 
       Console.WriteLine();
@@ -139,17 +150,30 @@ public class Board
     {
       int x = rand.Next(BoardSize);
       int y = rand.Next(BoardSize);
-      if (x == 0 && y == 0) continue;
+
+      // no hazards in the 2x2 starting area
+      if (x == 0 && y == 0 || x == 1 && y == 0 || x == 1 && y == 1 || x == 0 && y == 1) continue;
+
+      // don't copy over previous hazards
       if (state[x, y] is PitRoom || state[x, y] is AmarokRoom || state[x, y] is MaelstromRoom) continue;
-      
+
       if (i >= hazards.Length)
       {
         if (Globals.DEBUG) Console.WriteLine($"iteration: {i}, fountain room");
+        
+        // place the fountain in the second half of the board (both axes)
         int newX = rand.Next(BoardSize / 2, BoardSize);
         int newY = rand.Next(BoardSize / 2, BoardSize);
-        if (state[newX, newY] is PitRoom || state[newX, newY] is AmarokRoom || state[newX, newY] is MaelstromRoom) continue;
+        if (
+          state[newX, newY] is PitRoom ||
+          state[newX, newY] is AmarokRoom ||
+          state[newX, newY] is MaelstromRoom
+        ) continue;
+
         state[newX, newY] = new FountainRoom(newX, newY);
-      } else {
+      }
+      else
+      {
         if (Globals.DEBUG) Console.WriteLine($"iteration: {i}, hazard room");
         switch (hazards[i])
         {
