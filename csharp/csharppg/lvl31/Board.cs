@@ -51,7 +51,7 @@ public class Board
     for (int i = 0; i < result.Length; i++)
     {
       result[i] = RoomAt(dedup[i].Item1, dedup[i].Item2);
-      if (Globals.DEBUG) Console.WriteLine(dedup[i].ToString());
+      /*if (Globals.DEBUG) Console.WriteLine(dedup[i].ToString());*/
     }
 
     return result;
@@ -60,26 +60,43 @@ public class Board
   public void Render()
   {
     Room[] adjacentRooms = GetAdjacentRooms(CurrentCursor.X, CurrentCursor.Y);
-    Console.WriteLine($"{adjacentRooms.Length} rooms: {adjacentRooms}");
-    for (int i = 0; i < adjacentRooms.Length; i++)
-    {
-      Console.Write($"{adjacentRooms[i].ToString()} ");
-      if (i + 1 % (adjacentRooms.Length == 4 ? 2 : 3) == 0) Console.WriteLine("!");
-    }
     Room[] nonEmptyRooms = Enumerable.Where(adjacentRooms, r => !(r is EmptyRoom)).ToArray();
 
-    Console.WriteLine();
+    if (Globals.DEBUG)
+    {
+      bool isAtVerticalEdge = CurrentCursor.Y == 0 || CurrentCursor.Y == BoardSize - 1;
+      int linesPrinted = 0;
+      for (int i = 0; i < adjacentRooms.Length; i++)
+      {
+        Console.Write($"{adjacentRooms[i].ToString()} ");
+        // 2 room width column at the vertical edges, otherwise 3 columns
+        int index = i + 1;
+        if (index % (isAtVerticalEdge ? 2 : 3) == 0)
+        {
+          Console.WriteLine();
+          linesPrinted++;
+        }
+      }
+      // ensure 3 lines so board doesn't shift
+      if (linesPrinted == 2) Console.WriteLine();
+      Console.WriteLine();
+
+    }
+
+    List<(string, ConsoleColor)> descriptions = new List<(string, ConsoleColor)> { };
     foreach (Room ar in nonEmptyRooms)
     {
       (string nearbyDesc, ConsoleColor nearbyColor) = ar.Nearby();
-      Console.ForegroundColor = nearbyColor;
-      Console.WriteLine(nearbyDesc);
-      Console.ResetColor();
+      bool isInList = descriptions.Contains((nearbyDesc, nearbyColor));
+      if (isInList) continue;
+      descriptions.Add((nearbyDesc, nearbyColor));
     }
 
     Border(BorderSide.Top, ConsoleColor.DarkGreen);
+    Console.WriteLine();
 
     int iterator = 0;
+    int line = 0;
     (string enterDesc, ConsoleColor enterColor) = ("", ConsoleColor.Gray);
     for (int i = 0; i < BoardState.GetLength(0); i++)
     {
@@ -94,11 +111,18 @@ public class Board
       }
       Border(BorderSide.Side, ConsoleColor.DarkGreen);
 
-      // write narrations[i] here
-
+      // narrations
+      if (descriptions.Count > 0 && line < descriptions.Count)
+      {
+        Console.ForegroundColor = descriptions[line].Item2;
+        Console.Write(descriptions[line].Item1);
+        Console.ResetColor();
+      }
       Console.WriteLine();
+      line++;
     }
     Border(BorderSide.Bottom, ConsoleColor.DarkGreen);
+
     Console.WriteLine();
 
     Console.WriteLine($"Use the arrow keys [ ▲ ▼ ◀ ▶ ] to move.");
@@ -135,10 +159,6 @@ public class Board
     {
       Console.WriteLine($"There are {hazards} hazards comprising: ");
       Console.WriteLine($"pits {pits}, amaroks: {amaroks}, maelstroms: {maelstroms}");
-      foreach (Hazard h in hazardList)
-      {
-        Console.WriteLine($"{h}");
-      }
     }
     return hazardList;
   }
@@ -160,7 +180,7 @@ public class Board
       if (i >= hazards.Length)
       {
         if (Globals.DEBUG) Console.WriteLine($"iteration: {i}, fountain room");
-        
+
         // place the fountain in the second half of the board (both axes)
         int newX = rand.Next(BoardSize / 2, BoardSize);
         int newY = rand.Next(BoardSize / 2, BoardSize);

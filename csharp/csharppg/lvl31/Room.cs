@@ -2,7 +2,7 @@ public abstract class Room
 {
   public Hazard? RoomHazard { get; }
   private ConsoleColor Color { get; }
-  private Point RoomCursor { get; }
+  public Point RoomCursor { get; }
 
   public Room(int x, int y, Hazard? hazard)
   {
