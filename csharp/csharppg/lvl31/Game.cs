@@ -1,29 +1,51 @@
 public static class Globals
 {
-  public const bool DEBUG = true;
+  public const bool DEBUG = false;
 }
+
+public record Message(string Text, ConsoleColor Color);
 
 public class Game
 {
   public Board GameBoard;
+  private bool ShouldEndGame { get; set; }
+  private Message EndGameMessage { get; set; }
 
   public Game(int size)
   {
-    GameBoard = new Board(size);
+    GameBoard = new Board(size, this);
+    EndGameMessage = new Message("The fountain awaits...", ConsoleColor.DarkGreen);
+  }
+
+  public void EndGame(Message msg)
+  {
+    Console.ForegroundColor = msg.Color;
+    Console.WriteLine(msg.Text);
+    Environment.Exit(0);
+  }
+
+  public void TriggerEndGame()
+  {
+    ShouldEndGame = true;
+  }
+
+  public void SetEndGameMessage(Message msg)
+  {
+    EndGameMessage = msg;
   }
 
   private void HandleInput()
   {
     do
     {
-      ConsoleKey[] validInputs = new[] { 
-        ConsoleKey.LeftArrow, 
-        ConsoleKey.RightArrow, 
-        ConsoleKey.UpArrow, 
-        ConsoleKey.DownArrow, 
-        ConsoleKey.Enter, 
-        ConsoleKey.R, 
-        ConsoleKey.Q, 
+      ConsoleKey[] validInputs = new[] {
+        ConsoleKey.LeftArrow,
+        ConsoleKey.RightArrow,
+        ConsoleKey.UpArrow,
+        ConsoleKey.DownArrow,
+        ConsoleKey.Enter,
+        ConsoleKey.R,
+        ConsoleKey.Q,
       };
       ConsoleKey key = Console.ReadKey().Key;
       if (!Array.Exists(validInputs, k => k == key)) continue;
@@ -51,13 +73,10 @@ public class Game
         case ConsoleKey.R:
           Console.Clear();
           int size = GameBoard.BoardSize;
-          GameBoard = new Board(size);
+          GameBoard = new Board(size, this);
           break;
         case ConsoleKey.Q:
-          Console.Clear();
-          Console.ForegroundColor = ConsoleColor.Green;
-          Console.WriteLine("The fountain awaits...");
-          Environment.Exit(0);
+          EndGame(new Message("The fountain awaits...", ConsoleColor.Green));
           break;
       }
       break;
@@ -70,8 +89,16 @@ public class Game
   {
     while (true)
     {
-      GameBoard.Render();
-      HandleInput();
+      if (ShouldEndGame)
+      {
+        GameBoard.Render(EndGameMessage);
+        EndGame(new Message("", ConsoleColor.DarkGray)); 
+      }
+      else
+      {
+        GameBoard.Render();
+        HandleInput();
+      }
     }
   }
 }
