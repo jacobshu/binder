@@ -3,24 +3,26 @@ public abstract class Room
   public Hazard? RoomHazard { get; }
   private ConsoleColor Color { get; }
   public Point RoomCursor { get; }
+  public Game CurrentGame { get; }
 
-  public Room(int x, int y, Hazard? hazard)
+  public Room(int x, int y, Hazard? hazard, Game game)
   {
     RoomHazard = hazard;
     RoomCursor = new Point(x, y);
+    CurrentGame = game;
   }
 
   public abstract void Render(bool isCurrentCursor);
 
   public bool IsEmpty() => RoomHazard == null;
 
-  public abstract (string, ConsoleColor) Nearby();
-  public abstract (string, ConsoleColor) Enter();
+  public abstract Message Nearby();
+  public abstract void Enter();
 }
 
 public class EmptyRoom : Room
 {
-  public EmptyRoom(int x, int y) : base(x, y, null) { }
+  public EmptyRoom(int x, int y, Game g) : base(x, y, null, g) { }
 
   public override void Render(bool isCurrentCursor)
   {
@@ -37,20 +39,19 @@ public class EmptyRoom : Room
     }
   }
 
-  public override (string, ConsoleColor) Enter()
+  public override void Enter()
   {
-    return ("You see nothing of note.", ConsoleColor.Gray);
   }
 
-  public override (string, ConsoleColor) Nearby()
+  public override Message Nearby()
   {
-    return ("", ConsoleColor.Gray);
+    return new Message("", ConsoleColor.Gray);
   }
 }
 
 public class FountainRoom : Room
 {
-  public FountainRoom(int x, int y) : base(x, y, null) { }
+  public FountainRoom(int x, int y, Game g) : base(x, y, null, g) { }
   public override void Render(bool isCurrentCursor)
   {
     Console.ForegroundColor = ConsoleColor.Yellow;
@@ -58,20 +59,21 @@ public class FountainRoom : Room
     Console.ResetColor();
   }
 
-  public override (string, ConsoleColor) Enter()
+  public override void Enter()
   {
-    return ("The fountain glitters before you!", ConsoleColor.Yellow);
+    CurrentGame.TriggerEndGame();
+    CurrentGame.SetEndGameMessage(new Message("The fountain glitters before you!", ConsoleColor.Yellow));
   }
 
-  public override (string, ConsoleColor) Nearby()
+  public override Message Nearby()
   {
-    return ("You hear water dripping nearby...", ConsoleColor.Yellow);
+    return new Message("You hear water dripping nearby...", ConsoleColor.Yellow);
   }
 }
 
 public class PitRoom : Room
 {
-  public PitRoom(int x, int y) : base(x, y, Hazard.Pit) { }
+  public PitRoom(int x, int y, Game g) : base(x, y, Hazard.Pit, g) { }
   public override void Render(bool isCurrentCursor)
   {
     Console.ForegroundColor = ConsoleColor.Black;
@@ -79,20 +81,21 @@ public class PitRoom : Room
     Console.ResetColor();
   }
 
-  public override (string, ConsoleColor) Enter()
+  public override void Enter()
   {
-    return ("You fall to your demise.", ConsoleColor.Black);
+    CurrentGame.TriggerEndGame();
+    CurrentGame.SetEndGameMessage(new Message("You fall to your demise.", ConsoleColor.Black));
   }
 
-  public override (string, ConsoleColor) Nearby()
+  public override Message Nearby()
   {
-    return ("You feel a draft coming from nearby.", ConsoleColor.Black);
+    return new Message("You feel a draft coming from nearby.", ConsoleColor.Black);
   }
 }
 
 public class MaelstromRoom : Room
 {
-  public MaelstromRoom(int x, int y) : base(x, y, Hazard.Maelstrom) { }
+  public MaelstromRoom(int x, int y, Game g) : base(x, y, Hazard.Maelstrom, g) { }
   public override void Render(bool isCurrentCursor)
   {
     Console.ForegroundColor = ConsoleColor.Blue;
@@ -100,20 +103,21 @@ public class MaelstromRoom : Room
     Console.ResetColor();
   }
 
-  public override (string, ConsoleColor) Enter()
+  public override void Enter()
   {
-    return ("You are taken up in a maelstrom!", ConsoleColor.Blue);
+    CurrentGame.TriggerEndGame();
+    CurrentGame.SetEndGameMessage(new Message("You are taken up in a maelstrom!", ConsoleColor.Blue));
   }
 
-  public override (string, ConsoleColor) Nearby()
+  public override Message Nearby()
   {
-    return ("You hear the growling of a maelstrom nearby", ConsoleColor.Gray);
+    return new Message("You hear the growling of a maelstrom nearby", ConsoleColor.Blue);
   }
 }
 
 public class AmarokRoom : Room
 {
-  public AmarokRoom(int x, int y) : base(x, y, Hazard.Amarok) { }
+  public AmarokRoom(int x, int y, Game g) : base(x, y, Hazard.Amarok, g) { }
   public override void Render(bool isCurrentCursor)
   {
     Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -121,14 +125,15 @@ public class AmarokRoom : Room
     Console.ResetColor();
   }
 
-  public override (string, ConsoleColor) Enter()
+  public override void Enter()
   {
-    return ("You are torn asunder by an amarok!", ConsoleColor.DarkRed);
+    CurrentGame.TriggerEndGame();
+    CurrentGame.SetEndGameMessage(new Message("You are torn asunder by an amarok!", ConsoleColor.DarkRed));
   }
 
-  public override (string, ConsoleColor) Nearby()
+  public override Message Nearby()
   {
-    return ("You smell the stench of an amarok nearby", ConsoleColor.Gray);
+    return new Message("You smell the stench of an amarok nearby", ConsoleColor.DarkRed);
   }
 }
 
