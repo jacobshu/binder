@@ -3,14 +3,16 @@ public class Board
   public int BoardSize { get; }
   public Point CurrentCursor { get; set; }
   private Room[,] BoardState;
+  public Game CurrentGame { get; }
   //    pit    ama   mael
   // sm   1      1      1  3/16,
   // md   2      2      1  5/36
   // lg   4      3      2  9/64
 
-  public Board(int size)
+  public Board(int size, Game g)
   {
     BoardSize = size;
+    CurrentGame = g;
     Random rand = new Random();
     Hazard[] hazards = CreateHazards(rand);
 
@@ -20,11 +22,13 @@ public class Board
     {
       for (int j = 0; j < size; j++)
       {
-        newState[i, j] = new EmptyRoom(i, j);
+        newState[i, j] = new EmptyRoom(i, j, g);
       }
     }
     BoardState = PlaceSpecialRooms(newState, hazards, rand);
   }
+
+  public Board GetBoard() { return this; }
 
   public Room RoomAt(int x, int y)
   {
@@ -104,7 +108,7 @@ public class Board
       for (int j = 0; j < BoardState.GetLength(1); j++)
       {
         bool isCurrentCursor = CurrentCursor.X == i && CurrentCursor.Y == j;
-        if (isCurrentCursor) (enterDesc, enterColor) = RoomAt(i, j).Enter();
+        if (isCurrentCursor) RoomAt(i, j).Enter();
         RoomAt(i, j).Render(isCurrentCursor);
         Console.ResetColor(); // • 
         iterator++;
@@ -122,6 +126,36 @@ public class Board
       line++;
     }
     Border(BorderSide.Bottom, ConsoleColor.DarkGreen);
+
+    Console.WriteLine();
+
+    Console.WriteLine($"Use the arrow keys [ ▲ ▼ ◀ ▶ ] to move.");
+    Console.WriteLine($"[R]eset the board. [Q]uit the game.");
+    Console.ResetColor();
+  }
+
+  public void Render(Message msg)
+  {
+    Console.Clear();
+    Border(BorderSide.Top, msg.Color);
+    Console.WriteLine();
+
+    int line = 0;
+    for (int i = 0; i < BoardState.GetLength(0); i++)
+    {
+      Border(BorderSide.Side, msg.Color);
+      for (int j = 0; j < BoardState.GetLength(1); j++)
+      {
+        bool isCurrentCursor = CurrentCursor.X == i && CurrentCursor.Y == j;
+        RoomAt(i, j).Render(isCurrentCursor);
+      }
+      Border(BorderSide.Side, msg.Color);
+      
+      if (line == 0) Console.Write(" " + msg.Text); 
+      Console.WriteLine();
+      line++;
+    }
+    Border(BorderSide.Bottom, msg.Color);
 
     Console.WriteLine();
 
@@ -190,7 +224,7 @@ public class Board
           state[newX, newY] is MaelstromRoom
         ) continue;
 
-        state[newX, newY] = new FountainRoom(newX, newY);
+        state[newX, newY] = new FountainRoom(newX, newY, CurrentGame);
       }
       else
       {
@@ -198,13 +232,13 @@ public class Board
         switch (hazards[i])
         {
           case Hazard.Pit:
-            state[x, y] = new PitRoom(x, y);
+            state[x, y] = new PitRoom(x, y, CurrentGame);
             break;
           case Hazard.Amarok:
-            state[x, y] = new AmarokRoom(x, y);
+            state[x, y] = new AmarokRoom(x, y, CurrentGame);
             break;
           case Hazard.Maelstrom:
-            state[x, y] = new MaelstromRoom(x, y);
+            state[x, y] = new MaelstromRoom(x, y, CurrentGame);
             break;
         }
       }
@@ -218,7 +252,7 @@ public class Board
     return new Point(rand.Next(BoardSize), rand.Next(BoardSize));
   }
 
-  private void Border(BorderSide side, ConsoleColor color)
+  public void Border(BorderSide side, ConsoleColor color)
   {
     string tl = "┏";
     string vl = "┃";
