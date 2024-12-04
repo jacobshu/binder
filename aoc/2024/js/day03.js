@@ -5,7 +5,7 @@ import * as fs from 'node:fs'
 import kleur from 'kleur'
 
 async function processLineByLine() {
-  let inputPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'day03.txt')
+  let inputPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '../data/', 'day03.txt')
   const fileStream = fs.createReadStream(inputPath);
 
   const reader = rl.createInterface({
@@ -18,8 +18,13 @@ async function processLineByLine() {
   for await (const line of reader) {
     count += scan(line)
     let ranges = metaCommand(line)
+    let last = 0
     ranges.forEach(r => {
-      withMeta += scan(line.slice(r[0], r[1]))
+      if (last === 0) {
+        last = r[1]
+        console.log(line.slice(r[0], r[1]))
+      }
+      // withMeta += scan(line.slice(r[0], r[1]))
     })
   }
 
