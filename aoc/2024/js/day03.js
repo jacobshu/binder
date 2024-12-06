@@ -3,7 +3,6 @@ import { fileURLToPath } from 'node:url';
 import * as path from 'node:path';
 import * as fs from 'node:fs'
 import kleur from 'kleur'
-import { argv0 } from 'node:process';
 
 async function processLineByLine() {
   let inputPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '../data/day03.txt')
