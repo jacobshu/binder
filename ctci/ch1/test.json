@@ -1,0 +1,9 @@
+[
+  { "fn": "is-unique", "args": ["abcde"], "expected": true },
+  { "fn": "is-unique", "args": ["ada"], "expected": false },
+  { "fn": "is-unique", "args": ["definistrate"], "expected": false },
+  { "fn": "is-unique", "args": ["with space"], "expected": true },
+  { "fn": "is-unique", "args": ["symbol!@#$%^&("], "expected": true },
+  { "fn": "is-unique", "args": ["symbol!@###$%^&(&"], "expected": false }
+]
+
