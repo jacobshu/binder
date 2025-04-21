@@ -1,9 +1,9 @@
 [
-  { "fn": "is-unique", "args": ["abcde"], "expected": true },
-  { "fn": "is-unique", "args": ["ada"], "expected": false },
-  { "fn": "is-unique", "args": ["definistrate"], "expected": false },
-  { "fn": "is-unique", "args": ["with space"], "expected": true },
-  { "fn": "is-unique", "args": ["symbol!@#$%^&("], "expected": true },
-  { "fn": "is-unique", "args": ["symbol!@###$%^&(&"], "expected": false }
+  { "problem": "1.1", "input": "abcde", "output": true },
+  { "problem": "1.1", "input": "ada", "output": false },
+  { "problem": "1.1", "input": "definistrate", "output": false },
+  { "problem": "1.1", "input": "with space", "output": false },
+  { "problem": "1.1", "input": "symbol!@#$%^&(", "output": true },
+  { "problem": "1.1", "input": "symbol!@###$%^&(&", "output": false }
 ]
 

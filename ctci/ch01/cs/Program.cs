@@ -1,10 +1,19 @@
-﻿bool IsUnique(string str)
+﻿namespace Chapter01
 {
-  Dictionary<char, bool> found = new Dictionary<char, bool>();
-  for (int i = 0; i < str.Length; i++)
+  public class Problem1_1
   {
-    if (found.ContainsKey(str[i]))
-      return false;
+    public static bool IsUnique(string str)
+    {
+      Dictionary<char, bool> found = new Dictionary<char, bool>();
+      for (int i = 0; i < str.Length; i++)
+      {
+        if (found.ContainsKey(str[i]))
+        {
+          return false;
+        }
+        found.Add(str[i], true);
+      }
+      return true;
+    }
   }
-  return true;
 }

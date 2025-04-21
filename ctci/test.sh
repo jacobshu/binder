@@ -1,6 +1,5 @@
 #!/usr/bin/env zsh
 
-
 function handle_new() {
     local name=$1
     
@@ -23,7 +22,36 @@ function handle_new() {
 # Function to handle the 'test' command
 function handle_test() {
     echo "Running tests..."
-    ls -d */ 2>/dev/null || echo "No directories found"
+    local directories=(*/)
+    
+    if [[ ${#directories[@]} -eq 0 ]]; then
+        echo "No directories found"
+        return
+    fi
+    
+    # Process each directory
+    for dir in "${directories[@]}"; do
+        # Remove trailing slash
+        dir=${dir%/}
+        echo "Processing directory: $dir"
+        
+        # Check directory type and run appropriate commands
+        if [[ -d "$dir/js" ]]; then
+            echo "  Testing JS directory..."
+            (cd "$dir/js" && pnpm test 2>/dev/null || echo "  No tests available in JS")
+        fi
+        
+        if [[ -d "$dir/cs" ]]; then
+            echo "  Testing CS directory..."
+            (cd "$dir/cs" && dotnet test 2>/dev/null || echo "  No tests available in CS")
+        fi
+        
+        if [[ -d "$dir/cpp" ]]; then
+            echo "  Testing CPP directory..."
+            # Add appropriate C++ test command here
+            echo "  No test command configured for CPP"
+        fi
+    done
 }
 
 # Main logic
