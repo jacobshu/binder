@@ -131,3 +131,30 @@ $RECYCLE.BIN/
 .DS_Store
 
 _NCrunch*
+
+# Executables and object files
+*.exe
+*.o
+*.obj
+*.d
+*.a
+*.lib
+
+# Libraries
+*.so
+*.dylib
+*.dll
+
+# Build artifacts
+build/
+bin/
+out/
+cmake-build-*/
+[Bb]uild/
+
+# Debug files
+*.pdb
+
+# Dependency directories (if managed manually)
+# include/
+# lib/
