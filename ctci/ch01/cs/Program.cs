@@ -48,4 +48,32 @@
     }
     return true;
   }
+
+  public static string Urlify(string url, int length)
+  {
+    if (length == 0) return "";
+
+    string result = "";
+    bool startCounting = false;
+    int count = 0;
+    for (int i = 0; i < url.Length; i++)
+    {
+      char c = url[i];
+      if (c == ' ')
+      {
+        if (!startCounting) continue;
+        if (count >= length) break;
+        result += "%20";
+        count += 1;
+      }
+      else
+      {
+        startCounting = true;
+        count += 1;
+        result += c;
+      }
+    }
+
+    return result;
+  }
 }

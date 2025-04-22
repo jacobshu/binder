@@ -22,9 +22,23 @@ public class IsPermutationTest
   [InlineData("ada", "aadd", false)]
   [InlineData("definistrate", "", false)]
   [InlineData("ze", "cz", false)]
-  public void IsUnique(string first, string second, bool expected)
+  public void IsPermutation(string first, string second, bool expected)
   {
     Assert.Equal(Chapter01.IsPermutation(first, second), expected);
   }
 }
+
+public class UrlifyTest
+{
+  [Theory]
+  [InlineData("ab c", 4, "ab%20c")]
+  [InlineData(" qp98 ru1-  5713l", 16, "qp98%20ru1-%20%205713l")]
+  [InlineData("", 0, "")]
+  [InlineData(" 2 3 ", 3, "2%203")]
+  public void Urlify(string url, int length, string expected)
+  {
+    Assert.Equal(Chapter01.Urlify(url, length), expected);
+  }
+}
+
 
